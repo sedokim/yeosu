@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>여수 지도</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <aside id="sidebar">
+        <h3>📍 위치 목록</h3>
+        <div id="btn-list"></div>
+
+        <h3 style="margin-top:20px">🔍 주변 찾기</h3>
+        <div id="cat-list"></div>
+        <div id="dong-section" style="display:none">
+            <h3 style="margin-top:16px">🗺️ 지역 선택</h3>
+            <input type="text" id="dong-search" placeholder="지역 검색…">
+            <div id="dong-list"></div>
+        </div>
+
+        <h3 style="margin-top:20px">🚌 교통정보</h3>
+        <div id="traffic-btns"></div>
+    </aside>
+
+    <div id="info-panel">
+        <div id="info-panel-header">
+            <span id="info-panel-title"></span>
+            <button id="info-panel-close">✕</button>
+        </div>
+        <div id="store-mode">
+            <input type="text" id="store-search" placeholder="가게 이름 검색…" disabled>
+            <div id="place-list"></div>
+        </div>
+        <div id="traffic-mode">
+            <div id="traffic-content"></div>
+        </div>
+    </div>
+
+    <div id="map"></div>
+    <button id="sidebar-toggle" aria-label="메뉴">&#9776;</button>
+    <div id="sidebar-overlay"></div>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9c11eaa8b1a735c9d448c6c21b8e8b4b&libraries=services,clusterer"></script>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>
