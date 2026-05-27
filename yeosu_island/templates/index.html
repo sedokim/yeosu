@@ -4,24 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>여수 지도</title>
+    <link rel="icon" href="data:,">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <div id="loading-overlay">
+        <div id="loading-box">
+            <div id="loading-spinner"></div>
+            <div id="loading-msg">여수 전체 데이터 로딩 중…</div>
+            <div id="loading-sub">잠시만 기다려주세요</div>
+            <div id="loading-bar-wrap"><div id="loading-bar"></div></div>
+        </div>
+    </div>
+
+    <div id="panels-wrapper">
     <aside id="sidebar">
+        <button id="sidebar-close-btn" aria-label="닫기">✕</button>
         <h3>📍 위치 목록</h3>
         <div id="btn-list"></div>
 
         <h3 style="margin-top:20px">🔍 주변 찾기</h3>
         <div id="cat-list"></div>
-        <div id="dong-section" style="display:none">
-            <h3 style="margin-top:16px">🗺️ 지역 선택</h3>
-            <input type="text" id="dong-search" placeholder="지역 검색…">
-            <div id="dong-list"></div>
-        </div>
-
-        <h3 style="margin-top:20px">🚌 교통정보</h3>
-        <div id="traffic-btns"></div>
+        <button id="sidebar-search-btn" disabled>탐색 시작</button>
     </aside>
+
+    <div id="region-panel">
+        <div id="region-header">
+            <div id="region-title-row">
+                <span>🗺️ 지역 선택</span>
+                <button id="region-close-btn" aria-label="닫기">✕</button>
+            </div>
+            <input type="text" id="region-search" placeholder="지역 검색…" autocomplete="off">
+            <div class="region-ctrl-btns">
+                <button class="region-ctrl-btn" id="region-select-all">전체</button>
+                <button class="region-ctrl-btn" id="region-deselect-all">해제</button>
+            </div>
+        </div>
+        <div id="region-list"></div>
+        <div id="region-footer">
+            <button id="region-search-btn" disabled>탐색 시작</button>
+        </div>
+    </div>
 
     <div id="info-panel">
         <div id="info-panel-header">
@@ -30,16 +53,53 @@
         </div>
         <div id="store-mode">
             <input type="text" id="store-search" placeholder="가게 이름 검색…" disabled>
+            <div id="place-controls">
+                <select id="page-size-select" disabled>
+                    <option value="5">5개</option>
+                    <option value="10">10개</option>
+                    <option value="20" selected>20개</option>
+                    <option value="50">50개</option>
+                    <option value="100">100개</option>
+                </select>
+            </div>
             <div id="place-list"></div>
+            <div id="pagination"></div>
         </div>
         <div id="traffic-mode">
             <div id="traffic-content"></div>
         </div>
     </div>
+    </div>
+
+    <div id="place-detail-modal">
+        <div id="place-detail-box">
+            <div id="place-detail-header">
+                <span id="place-detail-title"></span>
+                <button onclick="closeDetailModal()">✕</button>
+            </div>
+            <div id="place-detail-content"></div>
+        </div>
+    </div>
 
     <div id="map"></div>
     <button id="sidebar-toggle" aria-label="메뉴">&#9776;</button>
+    <button id="region-toggle" aria-label="지역 선택">🗺️</button>
+    <button id="results-toggle-btn" aria-label="결과 보기">📋</button>
     <div id="sidebar-overlay"></div>
+
+    <button id="traffic-fab" aria-label="교통정보">🚌</button>
+    <div id="traffic-menu"></div>
+
+    <div id="traffic-modal">
+        <div id="traffic-modal-box">
+            <div id="traffic-modal-header">
+                <span id="traffic-modal-title"></span>
+                <button id="traffic-modal-close">✕</button>
+            </div>
+            <div id="traffic-modal-body"></div>
+        </div>
+    </div>
+
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9c11eaa8b1a735c9d448c6c21b8e8b4b&libraries=services,clusterer"></script>
     <script src="{{ url_for('static', filename='main.js') }}"></script>
 </body>

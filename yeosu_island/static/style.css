@@ -1,5 +1,89 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* ===== 로딩 오버레이 ===== */
+#loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 14, 26, 0.97);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#loading-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 40px 48px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 20px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+    min-width: 280px;
+    text-align: center;
+}
+
+#loading-spinner {
+    width: 44px;
+    height: 44px;
+    border: 3px solid rgba(56, 189, 248, 0.2);
+    border-top-color: #38bdf8;
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+#loading-msg {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    word-break: keep-all;
+}
+
+#loading-sub {
+    font-size: 0.8rem;
+    color: #38bdf8;
+    min-height: 1.2em;
+}
+
+#loading-bar-wrap {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+#loading-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #38bdf8, #a855f7);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+}
+
+/* ===== 읍·면·동 구역 라벨 ===== */
+.district-label {
+    background: rgba(10, 14, 26, 0.75);
+    backdrop-filter: blur(4px);
+    color: #e2e8f0;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
 html, body {
     width: 100%;
     height: 100%;
@@ -8,16 +92,23 @@ html, body {
     display: flex;
 }
 
+/* 모바일에서는 wrapper 투명 처리 (자식이 직접 body 자식처럼 동작) */
+#panels-wrapper {
+    display: contents;
+}
+
 #sidebar {
-    width: 240px;
-    min-width: 240px;
+    z-index: 10;
+    width: 270px;
+    min-width: 270px;
     height: 100vh;
     background: #0f172a;
     border-right: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     flex-direction: column;
-    padding: 24px 16px;
+    padding: 20px 16px;
     overflow-y: auto;
+    flex-shrink: 0;
 }
 
 #sidebar h3 {
@@ -66,15 +157,146 @@ html, body {
     color: #fff;
 }
 
+/* ===== 지역 선택 패널 ===== */
+#region-panel {
+    z-index: 11;
+    width: 220px;
+    min-width: 220px;
+    height: 100vh;
+    background: #0a0f1e;
+    border-right: 1px solid rgba(255, 255, 255, 0.07);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+#region-panel.open { display: flex; }
+
+#region-header {
+    padding: 18px 14px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    flex-shrink: 0;
+}
+#region-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+#region-title-row > span {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #38bdf8;
+}
+#region-close-btn {
+    background: none;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 2px 4px;
+    line-height: 1;
+}
+#region-close-btn:hover { color: #f0f4ff; }
+#region-search {
+    width: 100%;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 7px;
+    color: #f0f4ff;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.8rem;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s, background 0.2s;
+}
+#region-search::placeholder { color: #475569; }
+#region-search:focus { border-color: rgba(56,189,248,0.5); background: rgba(255,255,255,0.08); }
+.region-ctrl-btns { display: flex; gap: 6px; }
+.region-ctrl-btn {
+    flex: 1;
+    padding: 5px 0;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    color: #94a3b8;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.76rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+.region-ctrl-btn:hover { background: rgba(56,189,248,0.12); color: #f0f4ff; }
+
+#region-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.region-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background 0.15s;
+    color: #94a3b8;
+    font-size: 0.83rem;
+    font-family: 'Noto Sans KR', sans-serif;
+    user-select: none;
+}
+.region-item:hover { background: rgba(255,255,255,0.05); color: #f0f4ff; }
+.region-item.checked { background: rgba(56,189,248,0.12); color: #e0f2fe; }
+.region-item input[type="checkbox"] {
+    width: 14px; height: 14px;
+    accent-color: #38bdf8;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.region-divider {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #334155;
+    padding: 8px 8px 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+#region-footer {
+    padding: 10px 12px 16px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    flex-shrink: 0;
+}
+#region-search-btn {
+    width: 100%;
+    padding: 11px;
+    background: linear-gradient(135deg, #38bdf8, #a855f7);
+    border: none;
+    border-radius: 9px;
+    color: #fff;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+#region-search-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+#region-search-btn:not(:disabled):hover { opacity: 0.85; }
+
 #info-panel {
-    width: 300px;
-    min-width: 300px;
+    width: 330px;
+    min-width: 330px;
     height: 100vh;
     background: #0f172a;
     border-right: 1px solid rgba(255,255,255,0.08);
     display: none;
     flex-direction: column;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 #info-panel-header {
@@ -113,6 +335,51 @@ html, body {
     margin: 10px 12px 4px;
     width: calc(100% - 24px);
 }
+#place-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 4px 12px 2px;
+    flex-shrink: 0;
+}
+#page-size-select {
+    padding: 4px 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 6px;
+    color: #475569;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.78rem;
+    outline: none;
+}
+#page-size-select:not(:disabled) { color: #94a3b8; cursor: pointer; }
+#page-size-select option { background: #0f172a; }
+#pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 6px 12px 10px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+.page-btn {
+    min-width: 28px;
+    height: 28px;
+    padding: 0 6px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    color: #94a3b8;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+.page-btn:hover:not(:disabled) { background: rgba(56,189,248,0.12); color: #f0f4ff; }
+.page-btn.active { background: rgba(56,189,248,0.2); border-color: #38bdf8; color: #fff; font-weight: 700; }
+.page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.page-dots { color: #475569; font-size: 0.78rem; padding: 0 2px; line-height: 28px; }
 
 #place-list {
     flex: 1;
@@ -232,7 +499,7 @@ html, body {
     border: 1px solid rgba(56, 189, 248, 0.3);
     border-radius: 10px;
     padding: 14px 18px;
-    min-width: 200px;
+    width: 240px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     color: #f0f4ff;
     font-family: 'Noto Sans KR', sans-serif;
@@ -270,12 +537,173 @@ html, body {
     right: 10px;
     cursor: pointer;
     font-size: 0.85rem;
-    color: #64748b;
-    background: none;
+    color: #fff;
+    background: rgba(0,0,0,0.45);
     border: none;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    line-height: 1;
+    padding: 0;
+}
+.overlay-close:hover { background: rgba(0,0,0,0.75); }
+
+/* 팝업 사진 */
+.overlay-photo-wrap {
+    position: relative;
+    margin: -14px -18px 10px;
+    width: calc(100% + 36px);
+    height: 130px;
+    border-radius: 10px 10px 0 0;
+    overflow: hidden;
+    background: linear-gradient(90deg, rgba(15,23,42,0.9) 0%, rgba(30,48,72,0.9) 50%, rgba(15,23,42,0.9) 100%);
+    background-size: 200% 100%;
+    animation: photoShimmer 1.4s ease infinite;
+}
+@keyframes photoShimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+.overlay-photo-wrap.loaded {
+    animation: none;
+    background: none;
+}
+.overlay-no-photo {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: #475569;
+}
+.overlay-photo {
+    width: 100%;
+    height: 130px;
+    object-fit: cover;
+    display: block;
+}
+.overlay-more-btn {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    background: rgba(0,0,0,0.55);
+    border: none;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+.overlay-more-btn:hover { background: rgba(56,189,248,0.7); }
+.overlay-phone {
+    font-size: 0.8rem;
+    color: #7dd3fc;
+    margin-top: 4px;
 }
 
-.overlay-close:hover { color: #f0f4ff; }
+/* 상세 모달 */
+#place-detail-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.82);
+    z-index: 5000;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+#place-detail-modal.open { display: flex; }
+#place-detail-box {
+    background: #0f172a;
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 16px;
+    width: min(92vw, 620px);
+    max-height: 82vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+#place-detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+}
+#place-detail-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #38bdf8;
+}
+#place-detail-header > button {
+    background: none;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 2px 6px;
+}
+#place-detail-header > button:hover { color: #f0f4ff; }
+#place-detail-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 16px 20px;
+}
+.detail-photos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    margin-bottom: 16px;
+}
+.detail-photo {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+.detail-photo:hover { opacity: 0.85; }
+.detail-section-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #38bdf8;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(56,189,248,0.2);
+    margin-bottom: 10px;
+}
+.detail-review {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.detail-review:last-child { border-bottom: none; }
+.detail-review-text {
+    font-size: 0.83rem;
+    color: #cbd5e1;
+    line-height: 1.5;
+    word-break: keep-all;
+}
+.detail-review-meta {
+    font-size: 0.72rem;
+    color: #475569;
+    margin-top: 4px;
+}
+.detail-no-content {
+    font-size: 0.82rem;
+    color: #475569;
+    text-align: center;
+    padding: 20px 0;
+}
 
 #cat-list {
     display: flex;
@@ -404,6 +832,18 @@ html, body {
     display: none;
 }
 
+/* ===== 지역 선택 토글 버튼 (기본 숨김) ===== */
+#region-toggle {
+    display: none;
+}
+
+/* ===== 사이드바 내 버튼들 / 고정 버튼들 (모바일 전용, 기본 숨김) ===== */
+#sidebar-search-btn,
+#sidebar-close-btn,
+#results-toggle-btn {
+    display: none;
+}
+
 /* ===== 오버레이 배경 (기본 숨김) ===== */
 #sidebar-overlay {
     display: none;
@@ -443,6 +883,53 @@ html, body {
     }
     #sidebar.open {
         transform: translateX(0);
+    }
+
+    /* 지역 패널 → 독립 오버레이 (왼쪽에서 슬라이드) */
+    #region-panel {
+        display: flex;
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: min(300px, 88vw);
+        min-width: unset;
+        z-index: 320;
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 6px 0 32px rgba(0,0,0,0.6);
+    }
+    #region-panel.open {
+        transform: translateX(0);
+    }
+
+    /* 지역 토글 버튼 (지도 아이콘) */
+    #region-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: 14px;
+        left: 68px;
+        z-index: 150;
+        width: 46px;
+        height: 46px;
+        background: #0f172a;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 10px;
+        font-size: 1.25rem;
+        cursor: pointer;
+        box-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+        transition: background 0.2s;
+        flex-shrink: 0;
+    }
+    #region-toggle:hover,
+    #region-toggle:active {
+        background: rgba(56, 189, 248, 0.14);
+    }
+    #region-toggle.active {
+        background: rgba(56, 189, 248, 0.2);
+        border-color: rgba(56, 189, 248, 0.5);
     }
 
     /* 인포패널 → 하단 바텀시트 */
@@ -510,6 +997,73 @@ html, body {
     #dong-list {
         max-height: 220px;
     }
+
+    /* 사이드바 닫기 버튼 */
+    #sidebar-close-btn {
+        display: flex;
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        border-radius: 8px;
+        color: #64748b;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+    }
+    #sidebar-close-btn:hover { background: rgba(255,255,255,0.12); color: #f0f4ff; }
+
+    /* 사이드바 내 탐색 시작 버튼 */
+    #sidebar-search-btn {
+        display: block;
+        width: 100%;
+        margin-top: 12px;
+        padding: 11px;
+        background: linear-gradient(135deg, #38bdf8, #a855f7);
+        border: none;
+        border-radius: 9px;
+        color: #fff;
+        font-family: 'Noto Sans KR', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+    #sidebar-search-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    #sidebar-search-btn:not(:disabled):hover { opacity: 0.85; }
+
+    /* 결과 보기 고정 버튼 (지도 버튼 옆) */
+    #results-toggle-btn {
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: 14px;
+        left: 122px;
+        z-index: 150;
+        width: 46px;
+        height: 46px;
+        background: #0f172a;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 10px;
+        font-size: 1.25rem;
+        cursor: pointer;
+        box-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+        transition: background 0.2s;
+        flex-shrink: 0;
+    }
+    #results-toggle-btn:hover,
+    #results-toggle-btn:active {
+        background: rgba(56, 189, 248, 0.14);
+    }
+    #results-toggle-btn.active {
+        background: rgba(56, 189, 248, 0.2);
+        border-color: rgba(56, 189, 248, 0.5);
+    }
 }
 
 /* ===== 모바일 (640px 미만) ===== */
@@ -530,4 +1084,384 @@ html, body {
     #traffic-content .tbl01 td {
         padding: 5px 4px;
     }
+}
+
+/* ===== 데스크탑 (1024px 이상) ===== */
+@media (min-width: 1024px) {
+
+    /* 지도는 항상 전체화면 고정 — 패널 열고 닫아도 움직이지 않음 */
+    #map {
+        position: fixed;
+        inset: 0;
+        height: 100vh;
+        z-index: 0;
+    }
+
+    /* 패널 wrapper: absolute 기준 컨테이너 */
+    #panels-wrapper {
+        display: block;
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        z-index: 500;
+        pointer-events: none;
+    }
+
+    /* 모든 패널: left:0 에 absolute — translateX(-100%) 로 숨김 */
+    #sidebar,
+    #region-panel,
+    #info-panel {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100vh;
+    }
+
+    /* 사이드바 */
+    #sidebar {
+        /* padding-top: 60px; */
+        pointer-events: auto;
+        transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #sidebar.collapsed {
+        transform: translateX(-100%);
+        pointer-events: none;
+    }
+
+    /* 상단 고정 버튼 공통 — 패널(z-index:500) 위에 항상 노출 */
+    #sidebar-toggle,
+    #region-toggle {
+        display: flex;
+        position: fixed;
+        top: 14px;
+        z-index: 2;
+        width: 42px;
+        height: 42px;
+        background: rgba(15, 23, 42, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        color: #38bdf8;
+        font-size: 1.2rem;
+        cursor: pointer;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(6px);
+        transition: background 0.2s;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    #sidebar-toggle { left: 14px; }
+    #region-toggle  { left: 64px; }
+    #sidebar-toggle:hover, #region-toggle:hover { background: rgba(56, 189, 248, 0.15); }
+    #region-toggle.active { background: rgba(56, 189, 248, 0.2); border-color: rgba(56, 189, 248, 0.5); }
+
+    /* 결과 버튼 (JS에서 display: flex 제어) */
+    #results-toggle-btn {
+        position: fixed;
+        top: 14px;
+        left: 114px;
+        z-index: 2;
+        width: 42px;
+        height: 42px;
+        background: rgba(15, 23, 42, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(6px);
+        transition: background 0.2s;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    #results-toggle-btn:hover { background: rgba(56, 189, 248, 0.15); }
+    #results-toggle-btn.active { background: rgba(56, 189, 248, 0.2); border-color: rgba(56, 189, 248, 0.5); }
+
+    /* X 닫기 버튼 (데스크탑 사이드바) */
+    #sidebar-close-btn {
+        display: flex;
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        background: none;
+        border: none;
+        color: #64748b;
+        font-size: 0.95rem;
+        cursor: pointer;
+        z-index: 10;
+        transition: color 0.15s;
+    }
+    #sidebar-close-btn:hover { color: #f0f4ff; }
+
+    /* 탐색 시작 버튼 (데스크탑) */
+    #sidebar-search-btn {
+        display: block;
+        width: 100%;
+        margin-top: 12px;
+        padding: 10px;
+        background: linear-gradient(135deg, #38bdf8, #a855f7);
+        border: none;
+        border-radius: 9px;
+        color: #fff;
+        font-family: 'Noto Sans KR', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+    #sidebar-search-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    #sidebar-search-btn:not(:disabled):hover { opacity: 0.85; }
+
+    /* 지역 패널 */
+    #region-panel {
+        display: flex;
+        transform: translateX(-100%);
+        pointer-events: none;
+        transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #region-panel.open {
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+
+    /* 인포 패널 */
+    #info-panel {
+        display: flex;
+        transform: translateX(-100%);
+        pointer-events: none;
+        transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #info-panel.is-open {
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+}
+
+/* ===== 교통정보 FAB ===== */
+#traffic-fab {
+    position: fixed;
+    bottom: 24px;
+    left: 14px;
+    z-index: 600;
+    width: 50px;
+    height: 50px;
+    background: rgba(15, 23, 42, 0.92);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 50%;
+    color: #38bdf8;
+    font-size: 1.3rem;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.55);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+}
+#traffic-fab:hover  { background: rgba(56,189,248,0.15); }
+#traffic-fab.active { background: rgba(56,189,248,0.22); border-color: rgba(56,189,248,0.55); transform: rotate(15deg); }
+
+/* ===== 교통정보 메뉴 팝업 ===== */
+#traffic-menu {
+    position: fixed;
+    bottom: 84px;
+    left: 14px;
+    z-index: 600;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    opacity: 0;
+    transform: translateY(14px);
+    pointer-events: none;
+    transition: opacity 0.22s ease, transform 0.22s ease;
+}
+#traffic-menu.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+.traffic-menu-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px 8px 12px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 24px;
+    color: #cbd5e1;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.45);
+    backdrop-filter: blur(6px);
+    white-space: nowrap;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.traffic-menu-btn:hover  { background: rgba(56,189,248,0.14); border-color: rgba(56,189,248,0.4); color: #f0f4ff; }
+.traffic-menu-btn.active { background: rgba(56,189,248,0.2);  border-color: rgba(56,189,248,0.55); color: #38bdf8; }
+
+/* ===== 교통정보 모달 (화면 가운데) ===== */
+#traffic-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(5px);
+    z-index: 700;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+#traffic-modal.open { display: flex; }
+
+#traffic-modal-box {
+    background: #0f172a;
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 18px;
+    width: min(94vw, 920px);
+    max-height: 82vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 10px 48px rgba(0,0,0,0.75);
+    animation: tmIn 0.22s ease;
+}
+@keyframes tmIn {
+    from { opacity: 0; transform: scale(0.96) translateY(8px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+#traffic-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+}
+#traffic-modal-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #38bdf8;
+    letter-spacing: -0.01em;
+}
+#traffic-modal-close {
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
+}
+#traffic-modal-close:hover { color: #f0f4ff; background: rgba(255,255,255,0.06); }
+
+#traffic-modal-body {
+    overflow-y: auto;
+    padding: 18px 22px;
+    flex: 1;
+    overscroll-behavior: contain;
+    color: #e2e8f0;
+}
+#traffic-modal-body h4,
+#traffic-modal-body .sub_tit02 {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #38bdf8;
+    margin: 16px 0 8px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(56,189,248,0.2);
+}
+#traffic-modal-body .scroll {
+    overflow-x: auto;
+    margin-bottom: 14px;
+}
+#traffic-modal-body .tbl01 {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    color: #cbd5e1;
+    min-width: 400px;
+}
+#traffic-modal-body .tbl01 th {
+    background: rgba(56,189,248,0.1);
+    color: #7dd3fc;
+    padding: 8px 8px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.08);
+    font-weight: 600;
+    white-space: nowrap;
+}
+#traffic-modal-body .tbl01 td {
+    padding: 7px 8px;
+    border: 1px solid rgba(255,255,255,0.06);
+    text-align: center;
+    vertical-align: middle;
+    line-height: 1.4;
+    color: #cbd5e1;
+}
+#traffic-modal-body .tbl01 tbody tr:hover td {
+    background: rgba(255,255,255,0.04);
+}
+#traffic-modal-body .tb_con {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+#traffic-modal-body .tb_con .tit {
+    background: rgba(56,189,248,0.08);
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+#traffic-modal-body .tb_con .tit h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #38bdf8;
+    margin: 0; padding: 0; border: none;
+}
+#traffic-modal-body .tb_con .tb_conbox { padding: 10px 14px; }
+#traffic-modal-body .tb_con .tb_conbox p {
+    font-size: 0.82rem;
+    color: #94a3b8;
+    line-height: 1.6;
+}
+#traffic-modal-body .txt_box02 {
+    background: rgba(56,189,248,0.05);
+    border-left: 3px solid #38bdf8;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    font-size: 0.82rem;
+    color: #94a3b8;
+    line-height: 1.6;
+}
+#traffic-modal-body .sub_tit01 { display: none; }
+
+/* ===== 교통 모달 모바일 ===== */
+@media (max-width: 1023px) {
+    #traffic-modal {
+        padding: 0;
+        align-items: flex-end;
+    }
+    #traffic-modal-box {
+        width: 100%;
+        max-height: 88vh;
+        border-radius: 16px 16px 0 0;
+        animation: tmInMobile 0.26s ease;
+    }
+    @keyframes tmInMobile {
+        from { opacity: 0; transform: translateY(40px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    #traffic-fab  { bottom: 80px; }
+    #traffic-menu { bottom: 138px; }
 }
